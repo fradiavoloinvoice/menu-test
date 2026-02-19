@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Fradiavolo | Pizza Contemporanea</title>
+    <meta name="description" content="Scopri il menu Fradiavolo: pizze tradizionali, diavole piccanti, pop creative, pasta e fritti. Pizza contemporanea con ingredienti DOP.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'fra-red': '#C8102E',
+                        'fra-yellow': '#FFD700',
+                        'fra-cream': '#FFF8E7',
+                        'fra-black': '#1a1a1a',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FFF8E7; }
+        .font-bebas { font-family: 'Bebas Neue', sans-serif; }
+        .section-tab { transition: all 0.2s ease; }
+        .section-tab.active { background-color: #FFD700; color: #1a1a1a; }
+        .section-tab:not(.active):hover { background-color: #FFF8E7; }
+        .subcategory-tab { transition: all 0.2s ease; }
+        .subcategory-tab.active { background-color: #C8102E; color: white; font-weight: 600; }
+        .subcategory-tab:not(.active):hover { background-color: #FFF8E7; }
+        .menu-section { display: none; }
+        .menu-section.active { display: block; }
+        .pizza-subsection { display: none; }
+        .pizza-subsection.active { display: block; }
+        .menu-item { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .menu-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .text-stroke { -webkit-text-stroke: 1px #1a1a1a; }
+        .marquee-container { overflow: hidden; white-space: nowrap; }
+        .marquee-content { display: inline-block; animation: marquee 20s linear infinite; }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        /* Modal Styles */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; overflow-y: auto; }
+        .modal-overlay.active { display: flex; justify-content: center; align-items: flex-start; padding: 20px; }
+        .modal-content { background: #FFF8E7; border-radius: 16px; max-width: 1000px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; margin: auto; }
+        .modal-header { background: linear-gradient(135deg, #C8102E 0%, #9a1830 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 16px 16px 0 0; position: sticky; top: 0; z-index: 10; }
+        .modal-close { position: absolute; top: 15px; right: 15px; background: #1a1a1a; color: white; border: 2px solid white; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .modal-close:hover { background: white; color: #1a1a1a; }
+        .modal-body { padding: 24px; }
+        .allergen-section { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .allergen-section h3 { color: #C8102E; font-size: 1.1rem; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #C8102E; }
+        .allergen-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        @media (min-width: 600px) { .allergen-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 900px) { .allergen-grid { grid-template-columns: repeat(3, 1fr); } }
+        .allergen-card { background: #FFF8E7; padding: 12px; border-radius: 8px; border-left: 3px solid #C8102E; }
+        .allergen-card strong { color: #C8102E; display: block; margin-bottom: 4px; font-size: 0.85rem; }
+        .allergen-card p { font-size: 0.75rem; color: #555; margin: 0; }
+        .impasto-card { background: #FFF8E7; padding: 12px; border-radius: 8px; margin-bottom: 8px; }
+        .impasto-card strong { color: #C8102E; }
+        .product-allergen-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        @media (min-width: 500px) { .product-allergen-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 768px) { .product-allergen-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 1000px) { .product-allergen-grid { grid-template-columns: repeat(4, 1fr); } }
+        .product-allergen-card { background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px; }
+        .product-allergen-card .name { font-weight: 600; font-size: 0.85rem; margin-bottom: 6px; }
+        .product-allergen-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+        .product-allergen-tag { background: #ffebee; color: #C8102E; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 500; }
+        .category-header { background: #C8102E; color: white; padding: 10px 14px; border-radius: 8px; margin: 16px 0 10px 0; font-weight: 600; font-size: 0.9rem; grid-column: 1 / -1; }
+        .no-allergen { color: #4caf50; font-size: 0.75rem; font-style: italic; }
+        .notice-box { background: #fff8e1; border: 1px solid #ffcc02; border-radius: 8px; padding: 12px; margin-bottom: 16px; font-size: 0.85rem; }
+        .notice-box strong { color: #8c6d00; }
+    </style>
+</head>
+<body class="bg-fra-cream">
+    <!-- Header -->
+    <header class="h-[35vh] border-b-2 border-solid border-black bg-cover bg-center bg-no-repeat flex flex-col justify-center items-center" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)), url('https://fradiavolopizzeria.com/img/head-menu2.jpg');">
+        <h1 class="font-bebas text-7xl md:text-9xl uppercase tracking-wide text-white text-center px-4" style="text-shadow: 4px 4px 8px rgba(0,0,0,0.6);">
+            <span class="header-title" data-it="il nostro menu" data-en="our menu" data-es="nuestro menu" data-fr="notre menu" data-de="unsere Speisekarte">il nostro menu</span>
+        </h1>
+        <p class="text-sm lg:text-2xl mt-4 text-white text-center px-4 uppercase" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
+            <span class="header-subtitle1" data-it="Il nostro menu cambia e si aggiorna sempre:" data-en="Our menu is always changing and updating:" data-es="Nuestro menu cambia y se actualiza siempre:" data-fr="Notre menu change et se met a jour constamment:" data-de="Unsere Speisekarte ändert sich und wird ständig aktualisiert:">Il nostro menu cambia e si aggiorna sempre:</span><br>
+            <span class="header-subtitle2" data-it="scegli tra cinque impasti diversi, pizze classiche e sempre nuove." data-en="choose from five different doughs, classic and new pizzas." data-es="elige entre cinco masas diferentes, pizzas clasicas y siempre nuevas." data-fr="choisissez parmi cinq pates differentes, pizzas classiques et toujours nouvelles." data-de="Wählen Sie aus fünf verschiedenen Teigen, klassische und immer neue Pizzen.">scegli tra cinque impasti diversi, pizze classiche e sempre nuove.</span>
+        </p>
+    </header>
+
+    <!-- Marquee Banner -->
+    <div class="bg-fra-cream border-b-2 border-black py-2 marquee-container">
+        <div class="marquee-content font-bebas text-2xl md:text-4xl text-fra-black uppercase">
+            <span class="mx-8 marquee-text" data-it="Attenzione, i piatti non sono presenti in tutti gli store. Consulta il menu nel tuo punto vendita" data-en="Attention, dishes may not be available in all stores. Check the menu at your location" data-es="Atencion, los platos no estan presentes en todas las tiendas. Consulta el menu en tu punto de venta" data-fr="Attention, les plats ne sont pas disponibles dans tous les magasins. Consultez le menu dans votre point de vente" data-de="Achtung, die Gerichte sind nicht in allen Filialen verfügbar. Schauen Sie in der Speisekarte Ihrer Filiale nach">Attenzione, i piatti non sono presenti in tutti gli store. Consulta il menu nel tuo punto vendita</span>
+            <span class="mx-8">•</span>
+            <span class="mx-8 marquee-text" data-it="Attenzione, i piatti non sono presenti in tutti gli store. Consulta il menu nel tuo punto vendita" data-en="Attention, dishes may not be available in all stores. Check the menu at your location" data-es="Atencion, los platos no estan presentes en todas las tiendas. Consulta el menu en tu punto de venta" data-fr="Attention, les plats ne sont pas disponibles dans tous les magasins. Consultez le menu dans votre point de vente" data-de="Achtung, die Gerichte sind nicht in allen Filialen verfügbar. Schauen Sie in der Speisekarte Ihrer Filiale nach">Attenzione, i piatti non sono presenti in tutti gli store. Consulta il menu nel tuo punto vendita</span>
+            <span class="mx-8">•</span>
+        </div>
+    </div>
+
+    <!-- Language Selector -->
+    <div class="bg-fra-cream border-b-2 border-black py-3 px-4">
+        <div class="max-w-7xl mx-auto flex justify-center gap-2">
+            <button onclick="setLanguage('it')" class="lang-btn px-4 py-2 rounded-lg font-medium text-sm bg-fra-red text-white" data-lang="it">Italiano</button>
+            <button onclick="setLanguage('en')" class="lang-btn px-4 py-2 rounded-lg font-medium text-sm bg-white border border-gray-300 hover:bg-fra-yellow" data-lang="en">English</button>
+            <button onclick="setLanguage('es')" class="lang-btn px-4 py-2 rounded-lg font-medium text-sm bg-white border border-gray-300 hover:bg-fra-yellow" data-lang="es">Espanol</button>
+            <button onclick="setLanguage('fr')" class="lang-btn px-4 py-2 rounded-lg font-medium text-sm bg-white border border-gray-300 hover:bg-fra-yellow" data-lang="fr">Francais</button>
+            <button onclick="setLanguage('de')" class="lang-btn px-4 py-2 rounded-lg font-medium text-sm bg-white border border-gray-300 hover:bg-fra-yellow" data-lang="de">Deutsch</button>
+        </div>
+    </div>
+
+    <!-- Category Tabs -->
+    <nav class="bg-fra-red border-b-2 border-black sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3">
+            <div class="flex flex-wrap justify-center gap-2">
+                <button onclick="showSection('pizze')" class="section-tab active px-4 py-2 rounded-lg font-semibold text-sm uppercase" data-section="pizze">
+                    <span class="mr-1">🍕</span> <span class="section-label" data-it="Pizze" data-en="Pizzas" data-es="Pizzas" data-fr="Pizzas" data-de="Pizzen">Pizze</span>
+                </button>
+                <button onclick="showSection('pasta')" class="section-tab px-4 py-2 rounded-lg font-semibold text-sm uppercase bg-white" data-section="pasta">
+                    <span class="mr-1">🍝</span> <span class="section-label" data-it="Pasta" data-en="Pasta" data-es="Pasta" data-fr="Pates" data-de="Nudeln">Pasta</span>
+                </button>
+                <button onclick="showSection('insalate')" class="section-tab px-4 py-2 rounded-lg font-semibold text-sm uppercase bg-white" data-section="insalate">
+                    <span class="mr-1">🥗</span> <span class="section-label" data-it="Insalate" data-en="Salads" data-es="Ensaladas" data-fr="Salades" data-de="Salate">Insalate</span>
+                </button>
+                <button onclick="showSection('fritti')" class="section-tab px-4 py-2 rounded-lg font-semibold text-sm uppercase bg-white" data-section="fritti">
+                    <span class="mr-1">🍟</span> <span class="section-label" data-it="Fritti" data-en="Fried" data-es="Fritos" data-fr="Fritures" data-de="Frittiertes">Fritti</span>
+                </button>
+                <button onclick="showSection('dolci')" class="section-tab px-4 py-2 rounded-lg font-semibold text-sm uppercase bg-white" data-section="dolci">
+                    <span class="mr-1">🍰</span> <span class="section-label" data-it="Dolci" data-en="Desserts" data-es="Postres" data-fr="Desserts" data-de="Desserts">Dolci</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+
+        <!-- PIZZE SECTION -->
+        <section id="pizze" class="menu-section active">
+            <!-- Pizza Subcategory Tabs -->
+            <div class="flex justify-center gap-2 mb-6 flex-wrap">
+                <button onclick="showPizzaSubsection('tradizionali')" class="subcategory-tab active px-5 py-2 rounded-full font-medium text-sm bg-white border-2 border-amber-400" data-pizza="tradizionali">
+                    <span class="pizza-label" data-it="Tradizionali" data-en="Traditional" data-es="Tradicionales" data-fr="Traditionnelles" data-de="Traditionelle">Tradizionali</span>
+                </button>
+                <button onclick="showPizzaSubsection('diavole')" class="subcategory-tab px-5 py-2 rounded-full font-medium text-sm bg-white border-2 border-amber-400" data-pizza="diavole">
+                    <span class="mr-1">🌶️</span> <span class="pizza-label" data-it="Diavole" data-en="Spicy" data-es="Picantes" data-fr="Epicees" data-de="Scharf">Diavole</span>
+                </button>
+                <button onclick="showPizzaSubsection('pop')" class="subcategory-tab px-5 py-2 rounded-full font-medium text-sm bg-white border-2 border-amber-400" data-pizza="pop">
+                    <span class="mr-1">✨</span> <span class="pizza-label" data-it="Pop" data-en="Pop" data-es="Pop" data-fr="Pop" data-de="Pop">Pop</span>
+                </button>
+            </div>
+
+            <!-- Tradizionali -->
+            <div id="tradizionali" class="pizza-subsection active">
+                <h2 class="text-3xl font-bold text-center mb-6 text-gray-800">
+                    <span class="subsection-title" data-it="🍕 Pizze Tradizionali" data-en="🍕 Traditional Pizzas" data-es="🍕 Pizzas Tradicionales" data-fr="🍕 Pizzas Traditionnelles" data-de="🍕 Traditionelle Pizzen">🍕 Pizze Tradizionali</span>
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-amber-200">
+                        <h3 class="font-bold text-lg text-gray-800">Margherita</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Basilico" data-en="La Concettina Tomato, Fiordilatte from Monti Lattari, Basil" data-es="Tomate La Concettina, fiordilatte de los Monti Lattari, albahaca" data-fr="Tomate La Concettina, fiordilatte des Monti Lattari, basilic" data-de="La Concettina Tomate, Fiordilatte vom Monti Lattari, Basilikum">Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Basilico</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-amber-200">
+                        <h3 class="font-bold text-lg text-gray-800">Margherita piu</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Parmigiano Reggiano DOP, Basilico" data-en="La Concettina Tomato, Fiordilatte from Monti Lattari, Parmigiano Reggiano DOP, Basil" data-es="Tomate La Concettina, fiordilatte de los Monti Lattari, Parmigiano Reggiano DOP, albahaca" data-fr="Tomate La Concettina, fiordilatte des Monti Lattari, Parmigiano Reggiano DOP, basilic" data-de="La Concettina Tomate, Fiordilatte vom Monti Lattari, Parmigiano Reggiano DOP, Basilikum">Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Parmigiano Reggiano DOP, Basilico</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-amber-200">
+                        <h3 class="font-bold text-lg text-gray-800">Margherita doppia mozzarella</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Pomodoro La Concettina, doppio Fiordilatte dei Monti Lattari, Basilico" data-en="La Concettina Tomato, Double Fiordilatte from Monti Lattari, Basil" data-es="Tomate La Concettina, doble fiordilatte de los Monti Lattari, albahaca" data-fr="Tomate La Concettina, double fiordilatte des Monti Lattari, basilic" data-de="La Concettina Tomate, Doppelter Fiordilatte vom Monti Lattari, Basilikum">Pomodoro La Concettina, doppio Fiordilatte dei Monti Lattari, Basilico</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-amber-200">
+                        <h3 class="font-bold text-lg text-gray-800">Bufala</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Pomodoro La Concettina, Mozzarella di Latte di Bufala La Cilentana, Pepe Macinato, Basilico, Olio EVO" data-en="La Concettina Tomato, La Cilentana Buffalo Mozzarella, Ground Pepper, Basil, Extra Virgin Olive Oil" data-es="Tomate La Concettina, mozzarella de bufala La Cilentana, pimienta negra molida, albahaca, aceite de oliva virgen extra" data-fr="Tomate La Concettina, mozzarella de bufflonne La Cilentana, poivre noir moulu, basilic, huile d'olive extra vierge" data-de="La Concettina Tomate, Büffelmozzarella La Cilentana, gemahlener Pfeffer, Basilikum, natives Olivenöl extra">Pomodoro La Concettina, Mozzarella di Latte di Bufala La Cilentana, Pepe Macinato, Basilico, Olio EVO</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-amber-200">
+                        <h3 class="font-bold text-lg text-gray-800">Marinara</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Pomodoro La Concettina, Aglio, Origano, Basilico" data-en="La Concettina Tomato, Garlic, Oregano, Basil" data-es="Tomate La Concettina, ajo, oregano, albahaca" data-fr="Tomate La Concettina, ail, origan, basilic" data-de="La Concettina Tomate, Knoblauch, Oregano, Basilikum">Pomodoro La Concettina, Aglio, Origano, Basilico</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-amber-200">
+                        <h3 class="font-bold text-lg text-gray-800">Napoli</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Alici di Cetara, Basilico" data-en="La Concettina Tomato, Fiordilatte from Monti Lattari, Cetara Anchovies, Basil" data-es="Tomate La Concettina, fiordilatte de los Monti Lattari, anchoas de Cetara, albahaca" data-fr="Tomate La Concettina, fiordilatte des Monti Lattari, anchois de Cetara, basilic" data-de="La Concettina Tomate, Fiordilatte vom Monti Lattari, Sardellen aus Cetara, Basilikum">Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Alici di Cetara, Basilico</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-amber-200">
+                        <h3 class="font-bold text-lg text-gray-800">Prosciutto cotto</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Cotto Raspini, Provolone del Monaco, Basilico" data-en="La Concettina Tomato, Fiordilatte from Monti Lattari, Raspini Cooked Ham, Provolone del Monaco, Basil" data-es="Tomate La Concettina, fiordilatte de los Monti Lattari, jamon cocido Raspini, Provolone del Monaco, albahaca" data-fr="Tomate La Concettina, fiordilatte des Monti Lattari, jambon cuit Raspini, Provolone del Monaco, basilic" data-de="La Concettina Tomate, Fiordilatte vom Monti Lattari, Raspini Kochschinken, Provolone del Monaco, Basilikum">Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Cotto Raspini, Provolone del Monaco, Basilico</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-amber-200">
+                        <h3 class="font-bold text-lg text-gray-800">Crostino cotto</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Fiordilatte dei Monti Lattari, Prosciutto Cotto Raspini, Olio EVO, Basilico" data-en="Fiordilatte from Monti Lattari, Raspini Cooked Ham, Extra Virgin Olive Oil, Basil" data-es="Fiordilatte de los Monti Lattari, jamon cocido Raspini, aceite de oliva virgen extra, albahaca" data-fr="Fiordilatte des Monti Lattari, jambon cuit Raspini, huile d'olive extra vierge, basilic" data-de="Fiordilatte vom Monti Lattari, Raspini Kochschinken, natives Olivenöl extra, Basilikum">Fiordilatte dei Monti Lattari, Prosciutto Cotto Raspini, Olio EVO, Basilico</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-amber-200">
+                        <h3 class="font-bold text-lg text-gray-800">Ortolana</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Fiordilatte dei Monti Lattari, Stracciatella Affumicata, Crema di peperoni al forno, Melanzane fritte, Pomodori secchi, Basilico" data-en="Fiordilatte from Monti Lattari, Smoked Stracciatella, Roasted Pepper Cream, Fried Eggplant, Sun-dried Tomatoes, Basil" data-es="Fiordilatte de los Monti Lattari, stracciatella ahumada, crema de pimientos asados, berenjena frita, tomate seco, albahaca" data-fr="Fiordilatte des Monti Lattari, stracciatella fumee, creme de poivrons rotis, aubergines frites, tomates sechees, basilic" data-de="Fiordilatte vom Monti Lattari, geräucherte Stracciatella, Röstpaprikacreme, frittierte Auberginen, getrocknete Tomaten, Basilikum">Fiordilatte dei Monti Lattari, Stracciatella Affumicata, Crema di peperoni al forno, Melanzane fritte, Pomodori secchi, Basilico</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-amber-200">
+                        <h3 class="font-bold text-lg text-gray-800">Prosciutto crudo</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Prosciutto Crudo di Parma, Basilico" data-en="La Concettina Tomato, Fiordilatte from Monti Lattari, Parma Prosciutto Crudo, Basil" data-es="Tomate La Concettina, fiordilatte de los Monti Lattari, jamon de Parma, albahaca" data-fr="Tomate La Concettina, fiordilatte des Monti Lattari, jambon cru de Parme, basilic" data-de="La Concettina Tomate, Fiordilatte vom Monti Lattari, Parmaschinken, Basilikum">Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Prosciutto Crudo di Parma, Basilico</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-amber-200">
+                        <h3 class="font-bold text-lg text-gray-800">Salsiccia e friarielli</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Fiordilatte dei Monti Lattari, Salsiccia Fresca, Friarielli, Basilico" data-en="Fiordilatte from Monti Lattari, Fresh Sausage, Friarielli, Basil" data-es="Fiordilatte de los Monti Lattari, salchicha fresca, friarielli, albahaca" data-fr="Fiordilatte des Monti Lattari, saucisse fraiche, friarielli, basilic" data-de="Fiordilatte vom Monti Lattari, frische Wurst, Friarielli, Basilikum">Fiordilatte dei Monti Lattari, Salsiccia Fresca, Friarielli, Basilico</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-amber-200">
+                        <h3 class="font-bold text-lg text-gray-800">Capricciosa</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Prosciutto Cotto Raspini, Carciofi, Funghi, Olive, Basilico" data-en="La Concettina Tomato, Fiordilatte from Monti Lattari, Raspini Cooked Ham, Artichokes, Mushrooms, Olives, Basil" data-es="Tomate La Concettina, fiordilatte de los Monti Lattari, jamon cocido Raspini, alcachofas, champinones, aceitunas, albahaca" data-fr="Tomate La Concettina, fiordilatte des Monti Lattari, jambon cuit Raspini, artichauts, champignons, olives, basilic" data-de="La Concettina Tomate, Fiordilatte vom Monti Lattari, Raspini Kochschinken, Artischocken, Pilze, Oliven, Basilikum">Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Prosciutto Cotto Raspini, Carciofi, Funghi, Olive, Basilico</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diavole -->
+            <div id="diavole" class="pizza-subsection">
+                <h2 class="text-3xl font-bold text-center mb-6 text-gray-800">
+                    <span class="subsection-title" data-it="🌶️ Pizze Diavole" data-en="🌶️ Spicy Pizzas" data-es="🌶️ Pizzas Picantes" data-fr="🌶️ Pizzas Epicees" data-de="🌶️ Scharfe Pizzen">🌶️ Pizze Diavole</span>
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-red-300 ring-2 ring-red-200">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="font-bold text-lg text-gray-800">Fradiavolo</h3>
+                            <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium">Signature</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Spianata Piccante Raspini ricetta Fradiavolo, Parmigiano Reggiano DOP, Basilico" data-en="La Concettina Tomato, Fiordilatte from Monti Lattari, Raspini Spicy Spianata Fradiavolo Recipe, Parmigiano Reggiano DOP, Basil" data-es="Tomate La Concettina, fiordilatte de los Monti Lattari, spianata picante Raspini - receta Fradiavolo, Parmigiano Reggiano DOP, albahaca" data-fr="Tomate La Concettina, fiordilatte des Monti Lattari, spianata piquante Raspini (recette Fradiavolo), Parmigiano Reggiano DOP, basilic" data-de="La Concettina Tomate, Fiordilatte vom Monti Lattari, Raspini scharfe Spianata (Fradiavolo-Rezept), Parmigiano Reggiano DOP, Basilikum">Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Spianata Piccante Raspini ricetta Fradiavolo, Parmigiano Reggiano DOP, Basilico</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-red-300">
+                        <h3 class="font-bold text-lg text-gray-800">Pepperoni</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Salamino Piccante La Granda, Miele d'Acacia Piccante, Basilico" data-en="La Concettina Tomato, Fiordilatte from Monti Lattari, La Granda Spicy Salami, Spicy Acacia Honey, Basil" data-es="Tomate La Concettina, fiordilatte de los Monti Lattari, salamino picante La Granda, miel de acacia picante, albahaca" data-fr="Tomate La Concettina, fiordilatte des Monti Lattari, salami piquant La Granda, miel d'acacia piquant, basilic" data-de="La Concettina Tomate, Fiordilatte vom Monti Lattari, La Granda scharfe Salami, scharfer Akazienhonig, Basilikum">Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Salamino Piccante La Granda, Miele d'Acacia Piccante, Basilico</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-red-300 ring-2 ring-red-200">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="font-bold text-lg text-gray-800">Fradiavolissima</h3>
+                            <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium">Extra Hot</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Spianata Piccante Raspini ricetta Fradiavolo, Salamino Piccante La Granda, 'Nduja di Spilinga, Basilico" data-en="La Concettina Tomato, Fiordilatte from Monti Lattari, Raspini Spicy Spianata Fradiavolo Recipe, La Granda Spicy Salami, Nduja from Spilinga, Basil" data-es="Tomate La Concettina, fiordilatte de los Monti Lattari, spianata picante Raspini - receta Fradiavolo, salamino picante La Granda, 'Nduja di Spilinga, albahaca" data-fr="Tomate La Concettina, fiordilatte des Monti Lattari, spianata piquante Raspini (recette Fradiavolo), salami piquant La Granda, 'Nduja di Spilinga, basilic" data-de="La Concettina Tomate, Fiordilatte vom Monti Lattari, Raspini scharfe Spianata (Fradiavolo-Rezept), La Granda scharfe Salami, 'Nduja aus Spilinga, Basilikum">Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Spianata Piccante Raspini ricetta Fradiavolo, Salamino Piccante La Granda, 'Nduja di Spilinga, Basilico</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pop -->
+            <div id="pop" class="pizza-subsection">
+                <h2 class="text-3xl font-bold text-center mb-6 text-gray-800">
+                    <span class="subsection-title" data-it="✨ Pizze Pop" data-en="✨ Pop Pizzas" data-es="✨ Pizzas Pop" data-fr="✨ Pizzas Pop" data-de="✨ Pop-Pizzen">✨ Pizze Pop</span>
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-purple-200 ring-2 ring-purple-100">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="font-bold text-lg text-gray-800">Li mortazza tua</h3>
+                            <span class="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full font-medium">Best Seller</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Fiordilatte dei Monti Lattari, Mortadella Bologna IGP Raspini, Stracciatella, Pesto di pistacchio, Granella di Pistacchio" data-en="Fiordilatte from Monti Lattari, Raspini Mortadella Bologna IGP, Stracciatella, Pistachio Pesto, Crushed Pistachios" data-es="Fiordilatte de los Monti Lattari, Mortadella Bologna IGP Raspini, stracciatella, pesto de pistacho, granillo de pistacho" data-fr="Fiordilatte des Monti Lattari, Mortadella Bologna IGP Raspini, stracciatella, pesto de pistache, eclats de pistache" data-de="Fiordilatte vom Monti Lattari, Raspini Mortadella Bologna IGP, Stracciatella, Pistazien-Pesto, gehackte Pistazien">Fiordilatte dei Monti Lattari, Mortadella Bologna IGP Raspini, Stracciatella, Pesto di pistacchio, Granella di Pistacchio</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-purple-200">
+                        <h3 class="font-bold text-lg text-gray-800">Gorgo 'n' Roll</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Fiordilatte dei Monti Lattari, Salsiccia Fresca, Gorgonzola DOP, Basilico" data-en="Fiordilatte from Monti Lattari, Fresh Sausage, Gorgonzola DOP, Basil" data-es="Fiordilatte de los Monti Lattari, salchicha fresca, Gorgonzola DOP, albahaca" data-fr="Fiordilatte des Monti Lattari, saucisse fraiche, Gorgonzola DOP, basilic" data-de="Fiordilatte vom Monti Lattari, frische Wurst, Gorgonzola DOP, Basilikum">Fiordilatte dei Monti Lattari, Salsiccia Fresca, Gorgonzola DOP, Basilico</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-purple-200 ring-2 ring-purple-100">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="font-bold text-lg text-gray-800">Mr. bean</h3>
+                            <span class="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full font-medium">Chef's Pick</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Pomodoro La Concettina, Salsiccia Fresca, Cipolla Rossa Caramellata, Fagioli Borlotti e Cannellini, Stracciatella Affumicata, Olio all'aglio, Pepe Nero, Basilico" data-en="La Concettina Tomato, Fresh Sausage, Caramelized Red Onion, Borlotti Beans, Cannellini Beans, Smoked Stracciatella, Garlic Oil, Ground Black Pepper, Basil" data-es="Tomate La Concettina, salchicha fresca, cebolla roja caramelizada, alubias borlotti, alubias cannellini, stracciatella ahumada, aceite de ajo, pimienta negra molida, albahaca" data-fr="Tomate La Concettina, saucisse fraiche, oignon rouge caramelise, haricots borlotti, haricots cannellini, stracciatella fumee, huile a l'ail, poivre noir moulu, basilic" data-de="La Concettina Tomate, frische Wurst, karamellisierte rote Zwiebel, Borlotti-Bohnen, Cannellini-Bohnen, geräucherte Stracciatella, Knoblauchöl, gemahlener schwarzer Pfeffer, Basilikum">Pomodoro La Concettina, Salsiccia Fresca, Cipolla Rossa Caramellata, Fagioli Borlotti e Cannellini, Stracciatella Affumicata, Olio all'aglio, Pepe Nero, Basilico</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-purple-200">
+                        <h3 class="font-bold text-lg text-gray-800">Stranger chips</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Pomodoro La Concettina, Capperi, Olio EVO, Maionese alla Senape, Chips di Patate, Pepe Nero Macinato" data-en="La Concettina Tomato, Capers, Extra Virgin Olive Oil, Mustard Mayonnaise, Potato Chips, Ground Black Pepper" data-es="Tomate La Concettina, alcaparras, aceite de oliva virgen extra, mayonesa de mostaza, chips de patata, pimienta negra molida" data-fr="Tomate La Concettina, capres, huile d'olive extra vierge, mayonnaise a la moutarde, chips de pommes de terre, poivre noir moulu" data-de="La Concettina Tomate, Kapern, natives Olivenöl extra, Senf-Mayonnaise, Kartoffelchips, gemahlener schwarzer Pfeffer">Pomodoro La Concettina, Capperi, Olio EVO, Maionese alla Senape, Chips di Patate, Pepe Nero Macinato</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-purple-200">
+                        <h3 class="font-bold text-lg text-gray-800">Porcino e contento</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Fiordilatte, Funghi misti, Fungo Porcino sott'olio, Polvere di Fungo Porcino, Basilico" data-en="Fiordilatte, Mixed Mushrooms, Porcini Mushrooms in Oil, Porcini Mushroom Powder, Basil" data-es="Fiordilatte, mezcla de setas, porcini en aceite, polvo de porcini deshidratados, albahaca" data-fr="Fiordilatte, melange de champignons, cepes a l'huile, poudre de cepes seches, basilic" data-de="Fiordilatte, gemischte Pilze, Steinpilze in Öl, Steinpilzpulver, Basilikum">Fiordilatte, Funghi misti, Fungo Porcino sott'olio, Polvere di Fungo Porcino, Basilico</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-purple-200">
+                        <h3 class="font-bold text-lg text-gray-800">Mr. Wurstel</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Wurstel di Carne di bovino Presidio Slow Food e suino, Basilico" data-en="La Concettina Tomato, Fiordilatte from Monti Lattari, Sausages from Slow Food Presidium Beef and Pork, Basil" data-es="Tomate La Concettina, fiordilatte de los Monti Lattari, wurstel de carne de vacuno Presidio Slow Food y cerdo, albahaca" data-fr="Tomate La Concettina, fiordilatte des Monti Lattari, saucisse de boeuf (Presidio Slow Food) et porc, basilic" data-de="La Concettina Tomate, Fiordilatte vom Monti Lattari, Würstchen vom Slow Food Presidium (Rind und Schwein), Basilikum">Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Wurstel di Carne di bovino Presidio Slow Food e suino, Basilico</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-purple-200">
+                        <h3 class="font-bold text-lg text-gray-800">Torna pesto</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Fiordilatte dei Monti Lattari, Prosciutto Cotto Raspini, Patate al Forno, Gocce di Pesto di Pra', Basilico" data-en="Fiordilatte from Monti Lattari, Raspini Cooked Ham, Baked Potatoes, Pra' Pesto Drops, Basil" data-es="Fiordilatte de los Monti Lattari, jamon cocido Raspini, patatas al horno, gotas de Pesto di Pra', albahaca" data-fr="Fiordilatte des Monti Lattari, jambon cuit Raspini, pommes de terre roties, gouttes de Pesto di Pra', basilic" data-de="Fiordilatte vom Monti Lattari, Raspini Kochschinken, Ofenkartoffeln, Pra'-Pesto-Tropfen, Basilikum">Fiordilatte dei Monti Lattari, Prosciutto Cotto Raspini, Patate al Forno, Gocce di Pesto di Pra', Basilico</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-purple-200">
+                        <h3 class="font-bold text-lg text-gray-800">Polpette a go go</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Parmigiano Reggiano DOP, Polpette di Carne di bovino Presidio Slow Food e suino, Basilico" data-en="La Concettina Tomato, Fiordilatte from Monti Lattari, Parmigiano Reggiano DOP, Meatballs from Slow Food Presidium Beef and Pork, Basil" data-es="Tomate La Concettina, fiordilatte de los Monti Lattari, Parmigiano Reggiano DOP, albondigas fritas (carne de vacuno Presidio Slow Food y cerdo), albahaca" data-fr="Tomate La Concettina, fiordilatte des Monti Lattari, Parmigiano Reggiano DOP, boulettes de viande frites (boeuf Presidio Slow Food et porc), basilic" data-de="La Concettina Tomate, Fiordilatte vom Monti Lattari, Parmigiano Reggiano DOP, Fleischbällchen vom Slow Food Presidium (Rind und Schwein), Basilikum">Pomodoro La Concettina, Fiordilatte dei Monti Lattari, Parmigiano Reggiano DOP, Polpette di Carne di bovino Presidio Slow Food e suino, Basilico</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-purple-200">
+                        <h3 class="font-bold text-lg text-gray-800">Fata Zucchina</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Fiordilatte dei Monti Lattari, Crema di Zucchine Fresche e Menta, Zucchine Fritte, Provolone del Monaco DOP, Pepe Macinato, Basilico" data-en="Fiordilatte from Monti Lattari, Fresh Zucchini and Mint Cream, Fried Zucchini, Provolone del Monaco DOP, Ground Pepper, Basil" data-es="Fiordilatte de los Monti Lattari, crema de calabacin y menta fresca, calabacin frito, Provolone del Monaco DOP, pimienta negra molida, albahaca" data-fr="Fiordilatte des Monti Lattari, creme de courgettes fraiches et menthe, courgettes frites, Provolone del Monaco DOP, poivre moulu, basilic" data-de="Fiordilatte vom Monti Lattari, frische Zucchini-Minz-Creme, frittierte Zucchini, Provolone del Monaco DOP, gemahlener Pfeffer, Basilikum">Fiordilatte dei Monti Lattari, Crema di Zucchine Fresche e Menta, Zucchine Fritte, Provolone del Monaco DOP, Pepe Macinato, Basilico</p>
+                    </div>
+                    <div class="menu-item bg-white rounded-xl p-5 border-2 border-purple-200">
+                        <h3 class="font-bold text-lg text-gray-800">Carciofunky</h3>
+                        <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Crema di carciofi, Fiordilatte dei Monti Lattari, Salsiccia Fresca, Rucola, Olive" data-en="Artichoke Cream, Fiordilatte from Monti Lattari, Fresh Sausage, Arugula, Olives" data-es="Crema de alcachofas, fiordilatte de los Monti Lattari, salchicha fresca, rucula, aceitunas" data-fr="Creme d'artichauts, fiordilatte des Monti Lattari, saucisse fraiche, roquette, olives" data-de="Artischockencreme, Fiordilatte vom Monti Lattari, frische Wurst, Rucola, Oliven">Crema di carciofi, Fiordilatte dei Monti Lattari, Salsiccia Fresca, Rucola, Olive</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PASTA SECTION -->
+        <section id="pasta" class="menu-section">
+            <h2 class="text-3xl font-bold text-center mb-6 text-gray-800">
+                <span class="section-header" data-it="🍝 Pasta" data-en="🍝 Pasta" data-es="🍝 Pasta" data-fr="🍝 Pates" data-de="🍝 Pasta">🍝 Pasta</span>
+            </h2>
+            <p class="text-center text-sm text-gray-600 mb-6 italic pasta-disclaimer" data-it="La pasta è presente solo in alcuni punti vendita." data-en="Pasta is only available at selected locations." data-es="La pasta solo está disponible en algunos puntos de venta." data-fr="Les pâtes ne sont disponibles que dans certains points de vente." data-de="Pasta ist nur in ausgewählten Filialen erhältlich.">La pasta è presente solo in alcuni punti vendita.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-amber-200">
+                    <h3 class="font-bold text-lg text-gray-800">Carbonara</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Mezze maniche, uova, pecorino romano, guanciale croccante, pepe nero" data-en="Mezze maniche, eggs, pecorino romano, crispy guanciale, black pepper" data-es="Mezze maniche, huevos, pecorino romano, guanciale crujiente, pimienta negra" data-fr="Mezze maniche, oeufs, pecorino romano, guanciale croustillant, poivre noir" data-de="Mezze maniche, Eier, Pecorino Romano, knuspriger Guanciale, schwarzer Pfeffer">Mezze maniche, uova, pecorino romano, guanciale croccante, pepe nero</p>
+                </div>
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-amber-200">
+                    <h3 class="font-bold text-lg text-gray-800">Amatriciana</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Mezze maniche, pomodoro, pecorino romano, guanciale croccante, pepe nero" data-en="Mezze maniche, tomato, pecorino romano, crispy guanciale, black pepper" data-es="Mezze maniche, tomate, pecorino romano, guanciale crujiente, pimienta negra" data-fr="Mezze maniche, tomate, pecorino romano, guanciale croustillant, poivre noir" data-de="Mezze maniche, Tomate, Pecorino Romano, knuspriger Guanciale, schwarzer Pfeffer">Mezze maniche, pomodoro, pecorino romano, guanciale croccante, pepe nero</p>
+                </div>
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-amber-200">
+                    <h3 class="font-bold text-lg text-gray-800">Cacio e pepe</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Tonnarelli, pecorino romano, pepe nero" data-en="Tonnarelli, pecorino romano, black pepper" data-es="Tonnarelli, pecorino romano, pimienta negra" data-fr="Tonnarelli, pecorino romano, poivre noir" data-de="Tonnarelli, Pecorino Romano, schwarzer Pfeffer">Tonnarelli, pecorino romano, pepe nero</p>
+                </div>
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-amber-200">
+                    <h3 class="font-bold text-lg text-gray-800">Dolcevita</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Mezze maniche, pomodoro, stracciatella, pesto di Pra" data-en="Mezze maniche, tomato, stracciatella, Pra' pesto" data-es="Mezze maniche, tomate, stracciatella, pesto de Pra" data-fr="Mezze maniche, tomate, stracciatella, pesto de Pra" data-de="Mezze maniche, Tomate, Stracciatella, Pra'-Pesto">Mezze maniche, pomodoro, stracciatella, pesto di Pra</p>
+                </div>
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-amber-200">
+                    <h3 class="font-bold text-lg text-gray-800">Ragu alla bolognese</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Mezze maniche al ragu alla bolognese" data-en="Mezze maniche with bolognese ragu" data-es="Mezze maniche con ragu a la bolonesa" data-fr="Mezze maniche au ragu a la bolognaise" data-de="Mezze maniche mit Bolognese-Ragù">Mezze maniche al ragu alla bolognese</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- INSALATE SECTION -->
+        <section id="insalate" class="menu-section">
+            <h2 class="text-3xl font-bold text-center mb-6 text-gray-800">
+                <span class="section-header" data-it="🥗 Insalate e Piattini" data-en="🥗 Salads and Small Plates" data-es="🥗 Ensaladas y Platillos" data-fr="🥗 Salades et Petits Plats" data-de="🥗 Salate und kleine Gerichte">🥗 Insalate e Piattini</span>
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-green-200">
+                    <h3 class="font-bold text-lg text-gray-800">Kung fu pollo</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Misticanza, Pollo Marinato in Salsa di Soia, Scaglie di Grana Padano DOP, Tarallo Mandorlato, Senape al Miele e Salsa Yogurt" data-en="Mixed Greens, Chicken Marinated in Soy Sauce, Grana Padano DOP Shavings, Almond Tarallo, Honey Mustard and Yogurt Sauce" data-es="Mezcla de lechugas, pollo marinado en salsa de soja, lascas de Grana Padano DOP, tarallo de almendra, mostaza con miel y salsa de yogur" data-fr="Mesclun, poulet marine a la sauce soja, copeaux de Grana Padano DOP, taralli aux amandes, moutarde au miel et sauce yaourt" data-de="Blattsalat, in Sojasoße mariniertes Huhn, Grana Padano DOP Hobel, Mandel-Tarallo, Honig-Senf und Joghurtsoße">Misticanza, Pollo Marinato in Salsa di Soia, Scaglie di Grana Padano DOP, Tarallo Mandorlato, Senape al Miele e Salsa Yogurt</p>
+                </div>
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-green-200">
+                    <h3 class="font-bold text-lg text-gray-800">Dillo all'avocado</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Misticanza, Carciofi, Pomodori Datterini, Olive, Granella di Pistacchio, Avocado, Olio EVO" data-en="Mixed Greens, Artichokes, Cherry Tomatoes, Olives, Crushed Pistachios, Avocado, Extra Virgin Olive Oil" data-es="Mezcla de lechugas, alcachofas, tomates datterini, aceitunas, granillo de pistacho, aguacate y aceite de oliva virgen extra" data-fr="Salade mesclun, artichauts, tomates datterini, olives, eclats de pistache, avocat, huile d'olive extra vierge" data-de="Blattsalat, Artischocken, Datterini-Tomaten, Oliven, gehackte Pistazien, Avocado, natives Olivenöl extra">Misticanza, Carciofi, Pomodori Datterini, Olive, Granella di Pistacchio, Avocado, Olio EVO</p>
+                </div>
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-green-200">
+                    <h3 class="font-bold text-lg text-gray-800">Myss feta</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Misticanza, Pomodorini Datterini, Tonno, Feta Greca DOP, Olive, Olio EVO" data-en="Mixed Greens, Cherry Tomatoes, Tuna, Greek Feta DOP, Olives, Extra Virgin Olive Oil" data-es="Mezcla de lechugas, tomates datterini, atun, feta griega DOP, aceitunas, aceite de oliva virgen extra" data-fr="Mesclun, tomates datterini, thon, feta grecque DOP, olives, huile d'olive extra vierge" data-de="Blattsalat, Datterini-Tomaten, Thunfisch, griechischer Feta DOP, Oliven, natives Olivenöl extra">Misticanza, Pomodorini Datterini, Tonno, Feta Greca DOP, Olive, Olio EVO</p>
+                </div>
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-green-200">
+                    <h3 class="font-bold text-lg text-gray-800">Zuppa di legumi e cereali</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="con Salvia, Rosmarino e Olio EVO" data-en="with Sage, Rosemary and Extra Virgin Olive Oil" data-es="Sopa de legumbres y cereales con salvia, romero y aceite de oliva virgen extra" data-fr="Soupe de legumineuses et cereales a la sauge, romarin et huile d'olive extra vierge" data-de="Hülsenfrüchte- und Getreidesuppe mit Salbei, Rosmarin und nativem Olivenöl extra">con Salvia, Rosmarino e Olio EVO</p>
+                </div>
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-green-200">
+                    <h3 class="font-bold text-lg text-gray-800">Burrata e pomodorini</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Burrata, Pomodorini Datterini, Misticanza, Pesto di Pra', Olio EVO" data-en="Burrata, Cherry Tomatoes, Mixed Greens, Pra' Pesto, Extra Virgin Olive Oil" data-es="Burrata, tomates datterini, mezcla de lechugas, Pesto di Pra', aceite de oliva virgen extra" data-fr="Burrata, tomates datterini, mesclun, Pesto di Pra', huile d'olive extra vierge" data-de="Burrata, Datterini-Tomaten, Blattsalat, Pra'-Pesto, natives Olivenöl extra">Burrata, Pomodorini Datterini, Misticanza, Pesto di Pra', Olio EVO</p>
+                </div>
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-green-200">
+                    <h3 class="font-bold text-lg text-gray-800">Crudo e bufala</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Prosciutto Crudo di Parma, Mozzarella di Latte di Bufala La Cilentana, Misticanza, Pepe Macinato, Olio EVO" data-en="Parma Prosciutto Crudo, La Cilentana Buffalo Mozzarella, Mixed Greens, Ground Pepper, Extra Virgin Olive Oil" data-es="Jamon curado Raspini, mozzarella de bufala La Cilentana, mezcla de lechugas, pimienta negra molida, aceite de oliva virgen extra" data-fr="Jambon cru Raspini, mozzarella de bufflonne La Cilentana, mesclun, poivre noir moulu, huile d'olive extra vierge" data-de="Parmaschinken, Büffelmozzarella La Cilentana, Blattsalat, gemahlener Pfeffer, natives Olivenöl extra">Prosciutto Crudo di Parma, Mozzarella di Latte di Bufala La Cilentana, Misticanza, Pepe Macinato, Olio EVO</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FRITTI SECTION -->
+        <section id="fritti" class="menu-section">
+            <h2 class="text-3xl font-bold text-center mb-6 text-gray-800">
+                <span class="section-header" data-it="🍟 Fritti" data-en="🍟 Fried" data-es="🍟 Fritos / Entrantes" data-fr="🍟 Fritures / Entrees" data-de="🍟 Frittiertes / Vorspeisen">🍟 Fritti</span>
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-w-6xl mx-auto">
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-orange-200">
+                    <h3 class="font-bold text-lg text-gray-800">Patatine fritte</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="con salse a scelta" data-en="with sauces of your choice" data-es="Patatas fritas" data-fr="Frites" data-de="Pommes frites">con salse a scelta</p>
+                </div>
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-orange-200">
+                    <h3 class="font-bold text-lg text-gray-800">Suppli al telefono</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Ragu e Mozzarella" data-en="Ragu and Mozzarella" data-es="Ragu de carne y mozzarella, croqueta de arroz rellena" data-fr="Ragu de viande et mozzarella" data-de="Ragù und Mozzarella">Ragu e Mozzarella</p>
+                </div>
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-orange-200">
+                    <h3 class="font-bold text-lg text-gray-800">Suppli cacio e pepe</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Pecorino e Pepe" data-en="Pecorino and Pepper" data-es="Queso pecorino y pimienta negra, croqueta de arroz rellena" data-fr="Pecorino et poivre noir" data-de="Pecorino und schwarzer Pfeffer">Pecorino e Pepe</p>
+                </div>
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-orange-200">
+                    <h3 class="font-bold text-lg text-gray-800">Crocchetta di patate</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Patate Rosse, Mozzarella, Prosciutto Cotto e Rosmarino" data-en="Red Potatoes, Mozzarella, Cooked Ham and Rosemary" data-es="Patatas rojas, mozzarella, jamon cocido y romero, croqueta frita" data-fr="Pommes de terre rouges, mozzarella, jambon cuit et romarin" data-de="Rote Kartoffeln, Mozzarella, Kochschinken und Rosmarin">Patate Rosse, Mozzarella, Prosciutto Cotto e Rosmarino</p>
+                </div>
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-orange-200">
+                    <h3 class="font-bold text-lg text-gray-800">Crocchetta mortadella e pistacchio</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Mortadella Bologna IGP e Pesto di Pistacchio" data-en="Mortadella Bologna IGP and Pistachio Pesto" data-es="Nuestra Crocchetta di patate, con Mortadella Bologna IGP y pesto de pistacho" data-fr="Mortadella Bologna IGP et pesto de pistache" data-de="Mortadella Bologna IGP und Pistazien-Pesto">Mortadella Bologna IGP e Pesto di Pistacchio</p>
+                </div>
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-orange-200">
+                    <h3 class="font-bold text-lg text-gray-800">Polpettine fritte</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Polpette di carne di bovino Presidio Slow Food e suino" data-en="Meatballs from Slow Food Presidium Beef and Pork" data-es="Albondigas fritas de carne - vacuno Presidio Slow Food y cerdo" data-fr="Boulettes de viande frites (boeuf Presidio Slow Food et porc)" data-de="Frittierte Fleischbällchen vom Slow Food Presidium (Rind und Schwein)">Polpette di carne di bovino Presidio Slow Food e suino</p>
+                </div>
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-orange-200">
+                    <h3 class="font-bold text-lg text-gray-800">Panelle</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="con sale, pepe e limone" data-en="with salt, pepper and lemon" data-es="Con sal, pimienta y limon" data-fr="Avec sel, poivre et citron" data-de="Mit Salz, Pfeffer und Zitrone">con sale, pepe e limone</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DOLCI SECTION -->
+        <section id="dolci" class="menu-section">
+            <h2 class="text-3xl font-bold text-center mb-6 text-gray-800">
+                <span class="section-header" data-it="🍰 Dolci" data-en="🍰 Desserts" data-es="🍰 Postres" data-fr="🍰 Desserts" data-de="🍰 Nachspeisen">🍰 Dolci</span>
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-pink-200">
+                    <h3 class="font-bold text-lg text-gray-800 item-title" data-it="Tortino al cioccolato" data-en="Chocolate Lava Cake" data-es="Tortino de chocolate" data-fr="Moelleux au chocolat" data-de="Schokokuchen mit flüssigem Kern">Tortino al cioccolato</h3>
+                </div>
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-pink-200">
+                    <h3 class="font-bold text-lg text-gray-800 item-title" data-it="Pizza alla Nutella" data-en="Nutella Pizza" data-es="Pizza con Nutella" data-fr="Pizza au Nutella" data-de="Nutella-Pizza">Pizza alla Nutella</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="con granella di pistacchio" data-en="with pistachio crumble" data-es="con granillo de pistacho" data-fr="avec eclats de pistache" data-de="mit gehackten Pistazien">con granella di pistacchio</p>
+                </div>
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-pink-200">
+                    <h3 class="font-bold text-lg text-gray-800">Tiramisu</h3>
+                </div>
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-pink-200">
+                    <h3 class="font-bold text-lg text-gray-800">Cheesecake</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Toppings: Nutella, amarena o pistacchio" data-en="Toppings: Nutella, sour cherry or pistachio" data-es="Toppings: Nutella, amarena o pistacho" data-fr="Toppings: Nutella, amarena ou pistache" data-de="Toppings: Nutella, Amarena-Kirsche oder Pistazie">Toppings: Nutella, amarena o pistacchio</p>
+                </div>
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-pink-200">
+                    <h3 class="font-bold text-lg text-gray-800 item-title" data-it="Gelato al fiordilatte" data-en="Fiordilatte Gelato" data-es="Helado de fiordilatte" data-fr="Glace fiordilatte" data-de="Fiordilatte-Eis">Gelato al fiordilatte</h3>
+                    <p class="text-gray-600 text-sm mt-1 item-desc" data-it="Toppings: Nutella, amarena o pistacchio" data-en="Toppings: Nutella, sour cherry or pistachio" data-es="Toppings: Nutella, amarena o pistacho" data-fr="Toppings: Nutella, amarena ou pistache" data-de="Toppings: Nutella, Amarena-Kirsche oder Pistazie">Toppings: Nutella, amarena o pistacchio</p>
+                </div>
+                <div class="menu-item bg-white rounded-xl p-5 border-2 border-pink-200">
+                    <h3 class="font-bold text-lg text-gray-800 item-title" data-it="Sorbetto al limone" data-en="Lemon Sorbet" data-es="Sorbete de limon" data-fr="Sorbet au citron" data-de="Zitronen-Sorbet">Sorbetto al limone</h3>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- IMPASTI SECTION -->
+    <section class="bg-fra-yellow px-6 md:px-10 pt-6 pb-8 uppercase text-fra-black border-y-2 border-black">
+        <h2 class="font-bebas text-5xl md:text-6xl text-center mb-8 text-fra-black">
+            <span class="impasti-title" data-it="I Nostri Impasti" data-en="Our Doughs" data-es="Nuestras Masas" data-fr="Nos Pates" data-de="Unsere Teige">I Nostri Impasti</span>
+        </h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-6xl mx-auto">
+            <div class="bg-white rounded-xl p-4 text-center border-2 border-fra-black">
+                <img src="https://fradiavolopizzeria.com/img/impasti/Classico.png" alt="Classico" class="w-20 h-20 mx-auto mb-2 object-contain" onerror="this.style.display='none'">
+                <h3 class="font-bold text-lg impasti-name" data-it="Classico" data-en="Classic" data-es="Clasico" data-fr="Classique" data-de="Klassisch">Classico</h3>
+                <p class="text-xs text-gray-600 mt-1 normal-case impasti-desc" data-it="Un impasto di farina di grano tenero per una pizza molto profumata e saporita." data-en="A soft wheat flour dough for a very fragrant and tasty pizza." data-es="Una masa de harina de trigo blando para una pizza muy aromatica y sabrosa." data-fr="Une pate de farine de ble tendre pour une pizza tres parfumee et savoureuse." data-de="Ein Teig aus Weichweizen für eine sehr duftende und schmackhafte Pizza.">Un impasto di farina di grano tenero per una pizza molto profumata e saporita.</p>
+            </div>
+            <div class="bg-white rounded-xl p-4 text-center border-2 border-fra-black">
+                <img src="https://fradiavolopizzeria.com/img/impasti/Sottile.png" alt="Sottile" class="w-20 h-20 mx-auto mb-2 object-contain" onerror="this.style.display='none'">
+                <h3 class="font-bold text-lg impasti-name" data-it="Sottile" data-en="Thin" data-es="Fina" data-fr="Fine" data-de="Dünn">Sottile</h3>
+                <p class="text-xs text-gray-600 mt-1 normal-case impasti-desc" data-it="Con farina di grano tenero per una pizza leggera, scrocchiarella, dal bordo basso e sottile." data-en="With soft wheat flour for a light, crispy pizza with a low, thin crust." data-es="Con harina de trigo blando para una pizza ligera, crujiente, de borde bajo y fino." data-fr="Avec farine de ble tendre pour une pizza legere, croustillante, a bord bas et fin." data-de="Mit Weichweizen für eine leichte, knusprige Pizza mit dünnem Rand.">Con farina di grano tenero per una pizza leggera, scrocchiarella, dal bordo basso e sottile.</p>
+            </div>
+            <div class="bg-white rounded-xl p-4 text-center border-2 border-fra-black">
+                <img src="https://fradiavolopizzeria.com/img/impasti/Nero.png" alt="Nero" class="w-20 h-20 mx-auto mb-2 object-contain" onerror="this.style.display='none'">
+                <h3 class="font-bold text-lg impasti-name" data-it="Nero" data-en="Black" data-es="Negro" data-fr="Noir" data-de="Schwarz">Nero</h3>
+                <p class="text-xs text-gray-600 mt-1 normal-case impasti-desc" data-it="Il sorprendente impasto con carbone vegetale in polvere che regala una pizza leggera e digeribile." data-en="The surprising dough with vegetable charcoal powder for a light and digestible pizza." data-es="La sorprendente masa con carbon vegetal en polvo que regala una pizza ligera y digerible." data-fr="La pate surprenante au charbon vegetal en poudre pour une pizza legere et digestible." data-de="Der überraschende Teig mit Pflanzenkohlepulver für eine leichte und bekömmliche Pizza.">Il sorprendente impasto con carbone vegetale in polvere che regala una pizza leggera e digeribile.</p>
+            </div>
+            <div class="bg-white rounded-xl p-4 text-center border-2 border-fra-black">
+                <img src="https://fradiavolopizzeria.com/img/impasti/Integrale.png" alt="Integrale" class="w-20 h-20 mx-auto mb-2 object-contain" onerror="this.style.display='none'">
+                <h3 class="font-bold text-lg impasti-name" data-it="Integrale" data-en="Whole Wheat" data-es="Integral" data-fr="Complet" data-de="Vollkorn">Integrale</h3>
+                <p class="text-xs text-gray-600 mt-1 normal-case impasti-desc" data-it="Una miscela di farina integrale di grano, semi di lino, crusca di grano e farina di avena." data-en="A blend of whole wheat flour, flax seeds, wheat bran and oat flour." data-es="Una mezcla de harina integral de trigo, semillas de lino, salvado de trigo y harina de avena." data-fr="Un melange de farine complete de ble, graines de lin, son de ble et farine d'avoine." data-de="Eine Mischung aus Vollkornweizenmehl, Leinsamen, Weizenkleie und Hafermehl.">Una miscela di farina integrale di grano, semi di lino, crusca di grano e farina di avena.</p>
+            </div>
+            <div class="bg-white rounded-xl p-4 text-center border-2 border-fra-black">
+                <img src="https://fradiavolopizzeria.com/img/impasti/Senza%20frumento.png" alt="Senza frumento" class="w-20 h-20 mx-auto mb-2 object-contain" onerror="this.style.display='none'">
+                <h3 class="font-bold text-lg impasti-name" data-it="Senza frumento" data-en="Wheat-free" data-es="Sin trigo" data-fr="Sans ble" data-de="Weizenfrei">Senza frumento</h3>
+                <p class="text-xs text-gray-600 mt-1 normal-case impasti-desc" data-it="Con farine prive di glutine, delicato. Non adatto ai celiaci." data-en="With gluten-free flours, delicate. Not suitable for celiacs." data-es="Con harinas sin gluten, delicado. No apto para celiacos." data-fr="Avec farines sans gluten, delicat. Non adapte aux celiaques." data-de="Mit glutenfreien Mehlen, zart. Nicht für Zöliakiepatienten geeignet.">Con farine prive di glutine, delicato. Non adatto ai celiaci.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Allergen CTA Section -->
+    <section class="bg-white px-6 md:px-10 py-10 text-center border-y-2 border-black">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-4xl mb-4">
+                <span>&#9888;</span>
+            </div>
+            <h2 class="font-bebas text-3xl md:text-4xl text-fra-black mb-4">
+                <span class="allergen-title" data-it="Informazioni sugli Allergeni" data-en="Allergen Information" data-es="Informacion sobre Alergenos" data-fr="Informations sur les Allergenes" data-de="Allergeninformationen">Informazioni sugli Allergeni</span>
+            </h2>
+            <p class="text-gray-600 text-sm md:text-base mb-6 max-w-xl mx-auto allergen-desc" data-it="Per informazioni dettagliate su allergeni e intolleranze alimentari, consulta il nostro libretto degli allergeni o chiedi al nostro personale." data-en="For detailed information on allergens and food intolerances, please check our allergen booklet or ask our staff." data-es="Para informacion detallada sobre alergenos e intolerancias alimentarias, consulta nuestro libro de alergenos o pregunta al personal." data-fr="Pour des informations detaillees sur les allergenes et intolerances alimentaires, consultez notre livret des allergenes ou demandez a notre personnel." data-de="Für detaillierte Informationen zu Allergenen und Lebensmittelunverträglichkeiten lesen Sie bitte unser Allergenheft oder fragen Sie unser Personal.">Per informazioni dettagliate su allergeni e intolleranze alimentari, consulta il nostro libretto degli allergeni o chiedi al nostro personale.</p>
+            <button onclick="openAllergenModal()" class="inline-block bg-fra-red hover:bg-red-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors duration-200 uppercase tracking-wide text-sm cursor-pointer border-none">
+                <span class="allergen-cta-btn" data-it="Consulta il Libretto Allergeni" data-en="View Allergen Booklet" data-es="Consultar Libro de Alergenos" data-fr="Consulter le Livret Allergenes" data-de="Allergenheft anzeigen">Consulta il Libretto Allergeni</span>
+            </button>
+            <p class="text-xs text-gray-500 mt-4 allergen-staff" data-it="Il nostro personale e a disposizione per qualsiasi informazione sugli ingredienti." data-en="Our staff is available for any information about ingredients." data-es="Nuestro personal esta disponible para cualquier informacion sobre los ingredientes." data-fr="Notre personnel est a votre disposition pour toute information sur les ingredients." data-de="Unser Personal steht Ihnen für alle Informationen zu den Zutaten zur Verfügung.">Il nostro personale e a disposizione per qualsiasi informazione sugli ingredienti.</p>
+        </div>
+    </section>
+
+    <!-- Marquee Banner Bottom -->
+    <div class="bg-fra-cream border-b-2 border-black py-3 marquee-container">
+        <div class="marquee-content font-bebas text-4xl md:text-6xl text-fra-black uppercase">
+            <span class="mx-8">eat pizza make love</span>
+            <span class="mx-8">eat pizza make love</span>
+            <span class="mx-8">eat pizza make love</span>
+            <span class="mx-8">eat pizza make love</span>
+            <span class="mx-8">eat pizza make love</span>
+            <span class="mx-8">eat pizza make love</span>
+        </div>
+    </div>
+
+    <!-- Allergen Modal -->
+    <div id="allergenModal" class="modal-overlay" onclick="closeAllergenModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <button class="modal-close" onclick="closeAllergenModal()">&times;</button>
+                <h2 class="font-bebas text-2xl md:text-3xl mb-2 modal-title" data-it="Libretto degli Allergeni" data-en="Allergen Booklet" data-es="Libro de Alergenos" data-fr="Livret des Allergenes" data-de="Allergenheft">Libretto degli Allergeni</h2>
+                <div class="text-xl font-bold">FRADIAVOLO</div>
+                <div class="text-xs opacity-80 mt-2">FRAGESA S.R.L. - Via Mazzini, 60/A - 10123 Torino</div>
+            </div>
+            <div class="modal-body">
+                <!-- 14 Allergeni -->
+                <div class="allergen-section">
+                    <h3 class="modal-section-title" data-it="I 14 Allergeni Alimentari" data-en="The 14 Food Allergens" data-es="Los 14 Alergenos Alimentarios" data-fr="Les 14 Allergenes Alimentaires" data-de="Die 14 Lebensmittelallergene">I 14 Allergeni Alimentari</h3>
+                    <div class="allergen-grid">
+                        <div class="allergen-card"><strong class="modal-allergen-name" data-it="GLUTINE" data-en="GLUTEN" data-es="GLUTEN" data-fr="GLUTEN" data-de="GLUTEN">GLUTINE</strong><p class="modal-allergen-desc" data-it="Cereali, grano, segale, orzo, avena, farro, kamut" data-en="Cereals, wheat, rye, barley, oats, spelt, kamut" data-es="Cereales, trigo, centeno, cebada, avena, espelta, kamut" data-fr="Cereales, ble, seigle, orge, avoine, epeautre, kamut" data-de="Getreide, Weizen, Roggen, Gerste, Hafer, Dinkel, Kamut">Cereali, grano, segale, orzo, avena, farro, kamut</p></div>
+                        <div class="allergen-card"><strong class="modal-allergen-name" data-it="CROSTACEI" data-en="CRUSTACEANS" data-es="CRUSTACEOS" data-fr="CRUSTACES" data-de="KREBSTIERE">CROSTACEI</strong><p class="modal-allergen-desc" data-it="Gamberi, scampi, granchi e simili" data-en="Shrimp, prawns, crabs and similar" data-es="Gambas, langostinos, cangrejos y similares" data-fr="Crevettes, langoustines, crabes et similaires" data-de="Garnelen, Langusten, Krabben und ähnliche">Gamberi, scampi, granchi e simili</p></div>
+                        <div class="allergen-card"><strong class="modal-allergen-name" data-it="UOVA" data-en="EGGS" data-es="HUEVOS" data-fr="OEUFS" data-de="EIER">UOVA</strong><p class="modal-allergen-desc" data-it="Uova e derivati: maionese, pasta all'uovo" data-en="Eggs and derivatives: mayonnaise, egg pasta" data-es="Huevos y derivados: mayonesa, pasta al huevo" data-fr="Oeufs et derives: mayonnaise, pates aux oeufs" data-de="Eier und Produkte: Mayonnaise, Eiernudeln">Uova e derivati: maionese, pasta all'uovo</p></div>
+                        <div class="allergen-card"><strong class="modal-allergen-name" data-it="PESCE" data-en="FISH" data-es="PESCADO" data-fr="POISSON" data-de="FISCH">PESCE</strong><p class="modal-allergen-desc" data-it="Prodotti con pesce, anche in piccole percentuali" data-en="Products with fish, even in small amounts" data-es="Productos con pescado, incluso en pequenas cantidades" data-fr="Produits avec poisson, meme en petites quantites" data-de="Produkte mit Fisch, auch in kleinen Mengen">Prodotti con pesce, anche in piccole percentuali</p></div>
+                        <div class="allergen-card"><strong class="modal-allergen-name" data-it="ARACHIDI" data-en="PEANUTS" data-es="CACAHUETES" data-fr="ARACHIDES" data-de="ERDNÜSSE">ARACHIDI</strong><p class="modal-allergen-desc" data-it="Creme e condimenti, anche in piccole dosi" data-en="Creams and dressings, even in small doses" data-es="Cremas y condimentos, incluso en pequenas dosis" data-fr="Cremes et assaisonnements, meme en petites doses" data-de="Cremes und Dressings, auch in kleinen Dosen">Creme e condimenti, anche in piccole dosi</p></div>
+                        <div class="allergen-card"><strong class="modal-allergen-name" data-it="SOIA" data-en="SOY" data-es="SOJA" data-fr="SOJA" data-de="SOJA">SOIA</strong><p class="modal-allergen-desc" data-it="Latte di soia, tofu, spaghetti di soia" data-en="Soy milk, tofu, soy noodles" data-es="Leche de soja, tofu, fideos de soja" data-fr="Lait de soja, tofu, nouilles de soja" data-de="Sojamilch, Tofu, Sojanudeln">Latte di soia, tofu, spaghetti di soia</p></div>
+                        <div class="allergen-card"><strong class="modal-allergen-name" data-it="LATTE" data-en="MILK" data-es="LECHE" data-fr="LAIT" data-de="MILCH">LATTE</strong><p class="modal-allergen-desc" data-it="Yogurt, biscotti, torte, gelato e creme" data-en="Yogurt, biscuits, cakes, ice cream and creams" data-es="Yogur, galletas, tartas, helado y cremas" data-fr="Yaourt, biscuits, gateaux, glaces et cremes" data-de="Joghurt, Kekse, Kuchen, Eis und Cremes">Yogurt, biscotti, torte, gelato e creme</p></div>
+                        <div class="allergen-card"><strong class="modal-allergen-name" data-it="FRUTTA A GUSCIO" data-en="TREE NUTS" data-es="FRUTOS SECOS" data-fr="FRUITS A COQUE" data-de="SCHALENFRÜCHTE">FRUTTA A GUSCIO</strong><p class="modal-allergen-desc" data-it="Mandorle, nocciole, noci, anacardi, pistacchi" data-en="Almonds, hazelnuts, walnuts, cashews, pistachios" data-es="Almendras, avellanas, nueces, anacardos, pistachos" data-fr="Amandes, noisettes, noix, noix de cajou, pistaches" data-de="Mandeln, Haselnüsse, Walnüsse, Cashews, Pistazien">Mandorle, nocciole, noci, anacardi, pistacchi</p></div>
+                        <div class="allergen-card"><strong class="modal-allergen-name" data-it="SEDANO" data-en="CELERY" data-es="APIO" data-fr="CELERI" data-de="SELLERIE">SEDANO</strong><p class="modal-allergen-desc" data-it="In preparati per zuppe, salse e concentrati" data-en="In soup preparations, sauces and concentrates" data-es="En preparados para sopas, salsas y concentrados" data-fr="Dans les preparations pour soupes, sauces et concentres" data-de="In Suppenfertiggerichten, Soßen und Konzentraten">In preparati per zuppe, salse e concentrati</p></div>
+                        <div class="allergen-card"><strong class="modal-allergen-name" data-it="SENAPE" data-en="MUSTARD" data-es="MOSTAZA" data-fr="MOUTARDE" data-de="SENF">SENAPE</strong><p class="modal-allergen-desc" data-it="Presente in salse e condimenti, mostarda" data-en="Present in sauces and dressings, mustard" data-es="Presente en salsas y condimentos, mostaza" data-fr="Present dans les sauces et assaisonnements, moutarde" data-de="In Soßen und Dressings, Senf">Presente in salse e condimenti, mostarda</p></div>
+                        <div class="allergen-card"><strong class="modal-allergen-name" data-it="SESAMO" data-en="SESAME" data-es="SESAMO" data-fr="SESAME" data-de="SESAM">SESAMO</strong><p class="modal-allergen-desc" data-it="Semi interi per il pane, farine" data-en="Whole seeds for bread, flours" data-es="Semillas enteras para pan, harinas" data-fr="Graines entieres pour pain, farines" data-de="Ganze Samen für Brot, Mehle">Semi interi per il pane, farine</p></div>
+                        <div class="allergen-card"><strong class="modal-allergen-name" data-it="SOLFITI" data-en="SULPHITES" data-es="SULFITOS" data-fr="SULFITES" data-de="SULFITE">SOLFITI</strong><p class="modal-allergen-desc" data-it="Conservanti in prodotti ittici, vino" data-en="Preservatives in fish products, wine" data-es="Conservantes en productos de pescado, vino" data-fr="Conservateurs dans produits de la mer, vin" data-de="Konservierungsmittel in Fischprodukten, Wein">Conservanti in prodotti ittici, vino</p></div>
+                        <div class="allergen-card"><strong class="modal-allergen-name" data-it="LUPINI" data-en="LUPIN" data-es="ALTRAMUCES" data-fr="LUPIN" data-de="LUPINEN">LUPINI</strong><p class="modal-allergen-desc" data-it="In cibi vegan: arrosti, salamini, farine" data-en="In vegan foods: roasts, salamis, flours" data-es="En alimentos veganos: asados, salchichas, harinas" data-fr="Dans aliments vegans: rotis, saucissons, farines" data-de="In veganen Lebensmitteln: Braten, Salami, Mehle">In cibi vegan: arrosti, salamini, farine</p></div>
+                        <div class="allergen-card"><strong class="modal-allergen-name" data-it="MOLLUSCHI" data-en="MOLLUSCS" data-es="MOLUSCOS" data-fr="MOLLUSQUES" data-de="WEICHTIERE">MOLLUSCHI</strong><p class="modal-allergen-desc" data-it="Cozze, vongole, ostriche, calamari, seppie" data-en="Mussels, clams, oysters, squid, cuttlefish" data-es="Mejillones, almejas, ostras, calamares, sepias" data-fr="Moules, palourdes, huitres, calamars, seiches" data-de="Muscheln, Venusmuscheln, Austern, Tintenfisch, Sepia">Cozze, vongole, ostriche, calamari, seppie</p></div>
+                    </div>
+                </div>
+
+                <!-- Impasti -->
+                <div class="allergen-section">
+                    <h3 class="modal-section-title" data-it="Gli Impasti" data-en="The Doughs" data-es="Las Masas" data-fr="Les Pates" data-de="Die Teige">Gli Impasti</h3>
+                    <div class="notice-box">
+                        <strong class="modal-notice-title" data-it="Avviso:" data-en="Notice:" data-es="Aviso:" data-fr="Avis:" data-de="Hinweis:">Avviso:</strong> <span class="modal-notice-text" data-it="Si invitano i clienti a segnalare al personale qualsiasi intolleranza o allergia." data-en="Customers are invited to inform staff of any intolerance or allergy." data-es="Se invita a los clientes a informar al personal de cualquier intolerancia o alergia." data-fr="Les clients sont invites a signaler au personnel toute intolerance ou allergie." data-de="Kunden werden gebeten, das Personal über Unverträglichkeiten oder Allergien zu informieren.">Si invitano i clienti a segnalare al personale qualsiasi intolleranza o allergia.</span>
+                    </div>
+                    <div class="impasto-card"><strong>IMPASTO CLASSICO:</strong> <span class="modal-impasto-desc" data-it="Farina, lievito" data-en="Flour, yeast" data-es="Harina, levadura" data-fr="Farine, levure" data-de="Mehl, Hefe">Farina, lievito</span></div>
+                    <div class="impasto-card"><strong>IMPASTO INTEGRALE:</strong> <span class="modal-impasto-desc" data-it="Farina integrale, cereali misti, lievito, soia" data-en="Whole wheat flour, mixed cereals, yeast, soy" data-es="Harina integral, cereales mixtos, levadura, soja" data-fr="Farine complete, cereales mixtes, levure, soja" data-de="Vollkornmehl, gemischte Getreide, Hefe, Soja">Farina integrale, cereali misti, lievito, soia</span></div>
+                    <div class="impasto-card"><strong>IMPASTO AL CARBONE VEGETALE:</strong> <span class="modal-impasto-desc" data-it="Farina, carbone vegetale in polvere, lievito" data-en="Flour, vegetable charcoal powder, yeast" data-es="Harina, carbon vegetal en polvo, levadura" data-fr="Farine, charbon vegetal en poudre, levure" data-de="Mehl, Pflanzenkohlepulver, Hefe">Farina, carbone vegetale in polvere, lievito</span></div>
+                    <div class="impasto-card"><strong>IMPASTO SENZA FRUMENTO:</strong> <span class="modal-impasto-desc" data-it="Amido di mais, olio EVO, farina di quinoa, lievito madre di riso" data-en="Corn starch, EVO oil, quinoa flour, rice sourdough" data-es="Almidon de maiz, aceite EVO, harina de quinoa, levadura madre de arroz" data-fr="Amidon de mais, huile EVO, farine de quinoa, levain de riz" data-de="Maisstärke, EVO-Öl, Quinoamehl, Reissauerteig">Amido di mais, olio EVO, farina di quinoa, lievito madre di riso</span></div>
+                    <div class="impasto-card"><strong>IMPASTO SOTTILE:</strong> <span class="modal-impasto-desc" data-it="Farina, lievito" data-en="Flour, yeast" data-es="Harina, levadura" data-fr="Farine, levure" data-de="Mehl, Hefe">Farina, lievito</span></div>
+                </div>
+
+                <!-- Allergeni per Prodotto -->
+                <div class="allergen-section">
+                    <h3 class="modal-section-title" data-it="Allergeni per Prodotto" data-en="Allergens by Product" data-es="Alergenos por Producto" data-fr="Allergenes par Produit" data-de="Allergene nach Produkt">Allergeni per Prodotto</h3>
+                    <div class="product-allergen-grid">
+                        <!-- PIZZE -->
+                        <div class="category-header modal-cat-header" data-it="PIZZE" data-en="PIZZAS" data-es="PIZZAS" data-fr="PIZZAS" data-de="PIZZEN">PIZZE</div>
+                        <div class="product-allergen-card"><div class="name">Margherita</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Margherita Piu</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Bufala</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Marinara</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Napoli</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span><span class="product-allergen-tag tag-pesce" data-it="Pesce" data-en="Fish" data-es="Pescado" data-fr="Poisson" data-de="Fisch">Pesce</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Capricciosa</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Prosciutto Cotto</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Prosciutto Crudo</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Ortolana</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Salsiccia e Friarielli</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span><span class="product-allergen-tag tag-solfiti" data-it="Solfiti" data-en="Sulphites" data-es="Sulfitos" data-fr="Sulfites" data-de="Sulfite">Solfiti</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Fradiavolo</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Fradiavolissima</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Pepperoni</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Li Mortazza Tua</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span><span class="product-allergen-tag tag-frutta" data-it="Frutta a guscio" data-en="Tree nuts" data-es="Frutos secos" data-fr="Fruits a coque" data-de="Schalenfrüchte">Frutta a guscio</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Gorgo'N'Roll</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Mr. Bean</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Stranger Chips</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Torna Pesto</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span><span class="product-allergen-tag tag-frutta" data-it="Frutta a guscio" data-en="Tree nuts" data-es="Frutos secos" data-fr="Fruits a coque" data-de="Schalenfrüchte">Frutta a guscio</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Polpette a Go Go</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span><span class="product-allergen-tag tag-uova" data-it="Uova" data-en="Eggs" data-es="Huevos" data-fr="Oeufs" data-de="Eier">Uova</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Fata Zucchina</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Carciofunky</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+
+                        <!-- FRITTI -->
+                        <div class="category-header modal-cat-header" data-it="ANTIPASTI E FRITTI" data-en="STARTERS AND FRIED" data-es="ENTRANTES Y FRITOS" data-fr="ENTREES ET FRITURES" data-de="VORSPEISEN UND FRITTIERTES">ANTIPASTI E FRITTI</div>
+                        <div class="product-allergen-card"><div class="name">Suppli al Telefono</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span><span class="product-allergen-tag tag-uova" data-it="Uova" data-en="Eggs" data-es="Huevos" data-fr="Oeufs" data-de="Eier">Uova</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Suppli Cacio e Pepe</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span><span class="product-allergen-tag tag-uova" data-it="Uova" data-en="Eggs" data-es="Huevos" data-fr="Oeufs" data-de="Eier">Uova</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Crocchetta di Patate</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span><span class="product-allergen-tag tag-uova" data-it="Uova" data-en="Eggs" data-es="Huevos" data-fr="Oeufs" data-de="Eier">Uova</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Crocchetta Mortadella e Pistacchio</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span><span class="product-allergen-tag tag-uova" data-it="Uova" data-en="Eggs" data-es="Huevos" data-fr="Oeufs" data-de="Eier">Uova</span><span class="product-allergen-tag tag-frutta" data-it="Frutta a guscio" data-en="Tree nuts" data-es="Frutos secos" data-fr="Fruits a coque" data-de="Schalenfrüchte">Frutta a guscio</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Polpettine Fritte</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span><span class="product-allergen-tag tag-uova" data-it="Uova" data-en="Eggs" data-es="Huevos" data-fr="Oeufs" data-de="Eier">Uova</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Panelle</div><div class="no-allergen modal-no-allergen" data-it="Nessun allergene" data-en="No allergens" data-es="Sin alergenos" data-fr="Sans allergenes" data-de="Keine Allergene">Nessun allergene</div></div>
+                        <div class="product-allergen-card"><div class="name">Patatine Fritte</div><div class="no-allergen modal-no-allergen" data-it="Nessun allergene" data-en="No allergens" data-es="Sin alergenos" data-fr="Sans allergenes" data-de="Keine Allergene">Nessun allergene</div></div>
+                        <div class="product-allergen-card"><div class="name">Burrata e Pomodorini</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Crudo e Bufala</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+
+                        <!-- PASTA -->
+                        <div class="category-header modal-cat-header" data-it="PASTA" data-en="PASTA" data-es="PASTA" data-fr="PATES" data-de="PASTA">PASTA</div>
+                        <div class="product-allergen-card"><div class="name">Carbonara</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span><span class="product-allergen-tag tag-uova" data-it="Uova" data-en="Eggs" data-es="Huevos" data-fr="Oeufs" data-de="Eier">Uova</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Amatriciana</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Cacio e Pepe</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Dolce Vita</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span><span class="product-allergen-tag tag-frutta" data-it="Frutta a guscio" data-en="Tree nuts" data-es="Frutos secos" data-fr="Fruits a coque" data-de="Schalenfrüchte">Frutta a guscio</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Ragu</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span><span class="product-allergen-tag tag-sedano" data-it="Sedano" data-en="Celery" data-es="Apio" data-fr="Celeri" data-de="Sellerie">Sedano</span></div></div>
+
+                        <!-- INSALATE -->
+                        <div class="category-header modal-cat-header" data-it="INSALATE" data-en="SALADS" data-es="ENSALADAS" data-fr="SALADES" data-de="SALATE">INSALATE</div>
+                        <div class="product-allergen-card"><div class="name">Kung Fu Pollo</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Dillo all'Avocado</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Myss Feta</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Zuppa di Legumi</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-sedano" data-it="Sedano" data-en="Celery" data-es="Apio" data-fr="Celeri" data-de="Sellerie">Sedano</span></div></div>
+
+                        <!-- DOLCI -->
+                        <div class="category-header modal-cat-header" data-it="DOLCI" data-en="DESSERTS" data-es="POSTRES" data-fr="DESSERTS" data-de="NACHSPEISEN">DOLCI</div>
+                        <div class="product-allergen-card"><div class="name">Tortino al Cioccolato</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span><span class="product-allergen-tag tag-uova" data-it="Uova" data-en="Eggs" data-es="Huevos" data-fr="Oeufs" data-de="Eier">Uova</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Pizza alla Nutella</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span><span class="product-allergen-tag tag-frutta" data-it="Frutta a guscio" data-en="Tree nuts" data-es="Frutos secos" data-fr="Fruits a coque" data-de="Schalenfrüchte">Frutta a guscio</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Tiramisu</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span><span class="product-allergen-tag tag-uova" data-it="Uova" data-en="Eggs" data-es="Huevos" data-fr="Oeufs" data-de="Eier">Uova</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Cheesecake</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-glutine" data-it="Glutine" data-en="Gluten" data-es="Gluten" data-fr="Gluten" data-de="Gluten">Glutine</span><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span><span class="product-allergen-tag tag-uova" data-it="Uova" data-en="Eggs" data-es="Huevos" data-fr="Oeufs" data-de="Eier">Uova</span></div></div>
+                        <div class="product-allergen-card"><div class="name">Gelato Fiordilatte</div><div class="product-allergen-tags"><span class="product-allergen-tag tag-latte" data-it="Latte" data-en="Milk" data-es="Leche" data-fr="Lait" data-de="Milch">Latte</span></div></div>
+                    </div>
+                </div>
+
+                <!-- Footer Modal -->
+                <div class="text-center text-sm text-gray-600 mt-6 pt-4 border-t border-gray-200">
+                    <strong>FRADIAVOLO</strong> - FRAGESA S.R.L.<br>
+                    <span class="modal-footer-text" data-it="Si invitano i clienti a segnalare al personale qualsiasi intolleranza o allergia." data-en="Customers are invited to inform staff of any intolerance or allergy." data-es="Se invita a los clientes a informar al personal de cualquier intolerancia o alergia." data-fr="Les clients sont invites a signaler au personnel toute intolerance ou allergie." data-de="Kunden werden gebeten, das Personal über Unverträglichkeiten oder Allergien zu informieren.">Si invitano i clienti a segnalare al personale qualsiasi intolleranza o allergia.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLang = 'it';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+
+            // Update language buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('bg-fra-red', 'text-white');
+                btn.classList.add('bg-white', 'border', 'border-gray-300');
+                if (btn.dataset.lang === lang) {
+                    btn.classList.remove('bg-white', 'border', 'border-gray-300');
+                    btn.classList.add('bg-fra-red', 'text-white');
+                }
+            });
+
+            // Update header text
+            document.querySelectorAll('.header-title').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+            document.querySelectorAll('.header-subtitle1').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+            document.querySelectorAll('.header-subtitle2').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+
+            // Update section labels
+            document.querySelectorAll('.section-label').forEach(el => {
+                el.textContent = el.dataset[lang];
+            });
+
+            // Update pizza subcategory labels
+            document.querySelectorAll('.pizza-label').forEach(el => {
+                el.textContent = el.dataset[lang];
+            });
+
+            // Update subsection titles
+            document.querySelectorAll('.subsection-title').forEach(el => {
+                el.textContent = el.dataset[lang];
+            });
+
+            // Update section headers
+            document.querySelectorAll('.section-header').forEach(el => {
+                el.textContent = el.dataset[lang];
+            });
+
+            // Update item descriptions
+            document.querySelectorAll('.item-desc').forEach(el => {
+                if (el.dataset[lang]) {
+                    el.textContent = el.dataset[lang];
+                }
+            });
+
+            // Update item titles (for desserts)
+            document.querySelectorAll('.item-title').forEach(el => {
+                if (el.dataset[lang]) {
+                    el.textContent = el.dataset[lang];
+                }
+            });
+
+            // Update impasti section
+            document.querySelectorAll('.impasti-title').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+            document.querySelectorAll('.impasti-name').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+            document.querySelectorAll('.impasti-desc').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+
+            // Update marquee text
+            document.querySelectorAll('.marquee-text').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+
+            // Update pasta disclaimer
+            document.querySelectorAll('.pasta-disclaimer').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+
+            // Update allergen CTA section
+            document.querySelectorAll('.allergen-title').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+            document.querySelectorAll('.allergen-desc').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+            document.querySelectorAll('.allergen-cta-btn').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+            document.querySelectorAll('.allergen-staff').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+
+            // Update modal content
+            document.querySelectorAll('.modal-title').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+            document.querySelectorAll('.modal-section-title').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+            document.querySelectorAll('.modal-allergen-name').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+            document.querySelectorAll('.modal-allergen-desc').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+            document.querySelectorAll('.modal-notice-title').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+            document.querySelectorAll('.modal-notice-text').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+            document.querySelectorAll('.modal-impasto-desc').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+            document.querySelectorAll('.modal-footer-text').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+
+            // Update modal product allergen section
+            document.querySelectorAll('.modal-cat-header').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+            document.querySelectorAll('.product-allergen-tag').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+            document.querySelectorAll('.modal-no-allergen').forEach(el => {
+                if (el.dataset[lang]) el.textContent = el.dataset[lang];
+            });
+        }
+
+        function openAllergenModal() {
+            document.getElementById('allergenModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAllergenModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('allergenModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAllergenModal();
+            }
+        });
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.menu-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Update tab styles
+            document.querySelectorAll('.section-tab').forEach(tab => {
+                tab.classList.remove('active');
+                tab.classList.add('bg-white');
+                if (tab.dataset.section === sectionId) {
+                    tab.classList.add('active');
+                    tab.classList.remove('bg-white');
+                }
+            });
+
+            // Reset pizza subsections when switching to pizze
+            if (sectionId === 'pizze') {
+                showPizzaSubsection('tradizionali');
+            }
+        }
+
+        function showPizzaSubsection(subsectionId) {
+            // Hide all pizza subsections
+            document.querySelectorAll('.pizza-subsection').forEach(sub => {
+                sub.classList.remove('active');
+            });
+
+            // Show selected subsection
+            document.getElementById(subsectionId).classList.add('active');
+
+            // Update subcategory tab styles
+            document.querySelectorAll('.subcategory-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.pizza === subsectionId) {
+                    tab.classList.add('active');
+                }
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            setLanguage('it');
+            showSection('pizze');
+        });
+    </script>
+</body>
+</html>
